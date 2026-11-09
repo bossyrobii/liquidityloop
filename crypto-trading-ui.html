@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeView | Realistic Trading Dashboard</title>
+  <!-- Font Awesome for icons (realistic look) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Inter for clean UI -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0e14;
+      color: #e6e9f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Dashboard Container - realistic dark theme */
+    .dashboard {
+      width: 1400px;
+      max-width: 100%;
+      background: #12161f;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 28px;
+      border-bottom: 1px solid #1e2430;
+      background: #0f131c;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #f0f4ff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #9aa4b8;
+    }
+
+    .nav-links span {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-links span:hover,
+    .nav-links .active {
+      color: #ffffff;
+    }
+
+    .nav-links .active {
+      position: relative;
+    }
+
+    .nav-links .active::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #3b82f6;
+      border-radius: 4px;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .balance-badge {
+      background: #1a1f2b;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 15px;
+      border: 1px solid #2a3140;
+      color: #e0e7ff;
+    }
+
+    .balance-badge i {
+      color: #4ade80;
+      margin-right: 8px;
+    }
+
+    .avatar {
+      background: #2a3140;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #b9c2d9;
+      border: 1px solid #3e4759;
+      cursor: pointer;
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1px;
+      background: #1e2430;
+    }
+
+    /* Left Side - Chart & Market */
+    .left-panel {
+      background: #12161f;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Asset Header */
+    .asset-header {
+      padding: 24px 28px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid #1e2430;
+    }
+
+    .asset-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .coin-icon {
+      width: 46px;
+      height: 46px;
+      background: #f7931a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+    }
+
+    .asset-name h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .asset-name .pair {
+      font-size: 14px;
+      color: #8b94a9;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .price-area {
+      text-align: right;
+    }
+
+    .current-price {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .price-change {
+      font-size: 15px;
+      color: #4ade80;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .price-change i {
+      font-size: 12px;
+      margin-right: 4px;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      padding: 20px 28px 28px;
+      background: #12161f;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .timeframes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .timeframes span {
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      background: #1a1f2b;
+      color: #9aa4b8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .timeframes span.active {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .timeframes span:hover:not(.active) {
+      background: #232a38;
+      color: #fff;
+    }
+
+    .chart-actions i {
+      color: #6b7a93;
+      margin-left: 16px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .chart-actions i:hover {
+      color: #fff;
+    }
+
+    /* Canvas for chart - realistic line graph */
+    canvas#chartCanvas {
+      width: 100%;
+      height: 280px;
+      background: transparent;
+      display: block;
+      border-radius: 12px;
+    }
+
+    /* Bottom stats row */
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      padding: 0 28px 28px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      background: #1a1f2b;
+      padding: 12px 20px;
+      border-radius: 16px;
+      flex: 1;
+      min-width: 140px;
+      border: 1px solid #262e3c;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #8b94a9;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .stat-value.up {
+      color: #4ade80;
+    }
+
+    .stat-value.down {
+      color: #f87171;
+    }
+
+    /* Right Side - Order Panel */
+    .right-panel {
+      background: #0f131c;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border-left: 1px solid #1e2430;
+    }
+
+    .order-type-tabs {
+      display: flex;
+      background: #1a1f2b;
+      padding: 5px;
+      border-radius: 14px;
+      gap: 4px;
+    }
+
+    .order-type-tabs button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #9aa4b8;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .order-type-tabs button.active {
+      background: #262e3c;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .order-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #8b94a9;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .input-group label span {
+      color: #b9c2d9;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      background: #1a1f2b;
+      border: 1px solid #262e3c;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: white;
+      outline: none;
+      transition: border 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .input-wrapper input:focus {
+      border-color: #3b82f6;
+    }
+
+    .input-wrapper .suffix {
+      position: absolute;
+      right: 16px;
+      color: #8b94a9;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .percentage-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .percentage-buttons button {
+      background: #1a1f2b;
+      border: 1px solid #262e3c;
+      color: #9aa4b8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 0;
+      border-radius: 30px;
+      flex: 1;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .percentage-buttons button:hover {
+      background: #262e3c;
+      color: #fff;
+    }
+
+    .order-summary {
+      background: #1a1f2b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 6px;
+      font-size: 14px;
+      border: 1px solid #262e3c;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: #9aa4b8;
+    }
+
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .summary-row .value {
+      color: #e0e7ff;
+      font-weight: 500;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn-buy,
+    .btn-sell {
+      flex: 1;
+      padding: 16px 0;
+      border: none;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-buy {
+      background: #22c55e;
+      color: #0b0e14;
+    }
+
+    .btn-buy:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .btn-sell {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-sell:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    /* Order book / recent trades (realistic addition) */
+    .order-book {
+      margin-top: 8px;
+      background: #12161f;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #262e3c;
+    }
+
+    .order-book h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #b9c2d9;
+      margin-bottom: 12px;
+    }
+
+    .book-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid #1e2430;
+      color: #9aa4b8;
+    }
+
+    .book-row .price-bid {
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    .book-row .price-ask {
+      color: #f87171;
+      font-weight: 500;
+    }
+
+    .book-row:last-child {
+      border-bottom: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 1050px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .nav-links .active::after {
+        bottom: -8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Navbar -->
+    <div class="navbar">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="logo-text">TradeView</div>
+      </div>
+      <div class="nav-links">
+        <span class="active">Trade</span>
+        <span>Markets</span>
+        <span>Portfolio</span>
+        <span>Earn</span>
+        <span>History</span>
+      </div>
+      <div class="user-area">
+        <div class="balance-badge"><i class="fas fa-wallet"></i> $12,480.50</div>
+        <div class="avatar">JD</div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+      <!-- Left: Chart & Stats -->
+      <div class="left-panel">
+        <div class="asset-header">
+          <div class="asset-title">
+            <div class="coin-icon"><i class="fab fa-bitcoin"></i></div>
+            <div class="asset-name">
+              <h1>Bitcoin <span class="pair">BTC / USD</span></h1>
+            </div>
+          </div>
+          <div class="price-area">
+            <div class="current-price" id="currentPrice">$64,382.50</div>
+            <div class="price-change" id="priceChange"><i class="fas fa-arrow-up"></i> +2.34% (24h)</div>
+          </div>
+        </div>
+
+        <!-- Chart Area -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="timeframes">
+              <span>1H</span>
+              <span>4H</span>
+              <span class="active">1D</span>
+              <span>1W</span>
+              <span>1M</span>
+            </div>
+            <div class="chart-actions">
+              <i class="fas fa-cog"></i>
+              <i class="fas fa-expand-alt"></i>
+            </div>
+          </div>
+          <canvas id="chartCanvas" width="800" height="280"></canvas>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-label">24h High</div>
+            <div class="stat-value">$65,120.00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">24h Low</div>
+            <div class="stat-value">$62,845.20</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Volume (BTC)</div>
+            <div class="stat-value">18,492</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Market Cap</div>
+            <div class="stat-value">$1.26T</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Order Panel -->
+      <div class="right-panel">
+        <div class="order-type-tabs">
+          <button class="active">Limit</button>
+          <button>Market</button>
+          <button>Stop</button>
+        </div>
+
+        <div class="order-form">
+          <div class="input-group">
+            <label>Price <span>USD</span></label>
+            <div class="input-wrapper">
+              <input type="text" value="64,382.50" id="priceInput">
+              <span class="suffix">USD</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Amount <span>BTC</span></label>
+            <div class="input-wrapper">
+              <input type="text" value="0.50" id="amountInput">
+              <span class="suffix">BTC</span>
+            </div>
+            <div class="percentage-buttons">
+              <button>25%</button>
+              <button>50%</button>
+              <button>75%</button>
+              <button>100%</button>
+            </div>
+          </div>
+
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Total</span>
+              <span class="value" id="totalValue">$32,191.25</span>
+            </div>
+            <div class="summary-row">
+              <span>Fee (0.1%)</span>
+              <span class="value" id="feeValue">$32.19</span>
+            </div>
+            <div class="summary-row">
+              <span>Available</span>
+              <span class="value">$12,480.50</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-buy"><i class="fas fa-arrow-up"></i> Buy</button>
+            <button class="btn-sell"><i class="fas fa-arrow-down"></i> Sell</button>
+          </div>
+        </div>
+
+        <!-- Mini order book for realism -->
+        <div class="order-book">
+          <h4><i class="fas fa-list-ul" style="margin-right: 8px;"></i> Order Book</h4>
+          <div class="book-row">
+            <span>Bid</span>
+            <span class="price-bid">$64,380.00</span>
+            <span>0.42 BTC</span>
+          </div>
+          <div class="book-row">
+            <span>Bid</span>
+            <span class="price-bid">$64,375.20</span>
+            <span>1.20 BTC</span>
+          </div>
+          <div class="book-row">
+            <span>Ask</span>
+            <span class="price-ask">$64,385.10</span>
+            <span>0.85 BTC</span>
+          </div>
+          <div class="book-row">
+            <span>Ask</span>
+            <span class="price-ask">$64,390.00</span>
+            <span>2.10 BTC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // --- Realistic Chart Drawing with live-like data ---
+      const canvas = document.getElementById('chartCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas resolution to match displayed size (for crispness)
+      function resizeCanvas() {
+        const container = canvas.parentElement;
+        const width = container.clientWidth - 56; // account for padding 28px each side
+        const height = 280;
+        canvas.width = width;
+        canvas.height = height;
+        drawChart();
+      }
+
+      // Generate realistic price data (BTC-like movement)
+      const points = [];
+      const numPoints = 80;
+      let basePrice = 63000;
+      for (let i = 0; i < numPoints; i++) {
+        // Random walk with upward drift
+        const drift = 70;
+        const noise = (Math.random() - 0.4) * 200;
+        basePrice = basePrice + drift + noise;
+        points.push(basePrice);
+      }
+      // Ensure the last point is around current price
+      points[points.length - 1] = 64382.50;
+
+      // Compute min/max for scaling
+      let minPrice = Math.min(...points);
+      let maxPrice = Math.max(...points);
+      const padding = 20; // price padding
+      minPrice -= padding;
+      maxPrice += padding;
+
+      function drawChart() {
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Clear with dark background
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw subtle grid lines
+        ctx.strokeStyle = '#262e3c';
+        ctx.lineWidth = 0.8;
+        // Horizontal lines
+        for (let i = 0; i <= 4; i++) {
+          const y = (i / 4) * h;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+        // Vertical lines
+        for (let i = 0; i <= 6; i++) {
+          const x = (i / 6) * w;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+
+        // Map data points to canvas coordinates
+        function getX(index) {
+          return (index / (points.length - 1)) * w;
+        }
+        function getY(price) {
+          return h - ((price - minPrice) / (maxPrice - minPrice)) * h;
+        }
+
+        // Draw the area under the line (gradient fill)
+        const gradient = ctx.createLinearGradient(0, 0, 0, h);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+
+        ctx.beginPath();
+        ctx.moveTo(getX(0), h);
+        for (let i = 0; i < points.length; i++) {
+          ctx.lineTo(getX(i), getY(points[i]));
+        }
+        ctx.lineTo(getX(points.length - 1), h);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Draw the main line (blue gradient or solid)
+        ctx.beginPath();
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        for (let i = 0; i < points.length; i++) {
+          const x = getX(i);
+          const y = getY(points[i]);
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+
+        // Draw a subtle glow effect around the line
+        ctx.shadowColor = '#3b82f6';
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.shadowBlur = 0; // reset
+
+        // Draw last price dot
+        const lastX = getX(points.length - 1);
+        const lastY = getY(points[points.length - 1]);
+        ctx.beginPath();
+        ctx.fillStyle = '#3b82f6';
+        ctx.arc(lastX, lastY, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = '#3b82f6';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw small label with last price
+        ctx.font = 'bold 13px Inter, sans-serif';
+        ctx.fillStyle = '#e0e7ff';
+        ctx.fillText('$64,382.50', lastX - 70, lastY - 14);
+
+        // Draw axis labels (simple)
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillStyle = '#6b7a93';
+        // Y axis (price)
+        ctx.fillText(`$${maxPrice.toFixed(0)}`, 8, 16);
+        ctx.fillText(`$${minPrice.toFixed(0)}`, 8, h - 8);
+      }
+
+      // --- Update total and fee based on input ---
+      const priceInput = document.getElementById('priceInput');
+      const amountInput = document.getElementById('amountInput');
+      const totalValue = document.getElementById('totalValue');
+      const feeValue = document.getElementById('feeValue');
+      const currentPriceEl = document.getElementById('currentPrice');
+
+      function updateSummary() {
+        const price = parseFloat(priceInput.value.replace(/,/g, '')) || 0;
+        const amount = parseFloat(amountInput.value) || 0;
+        const total = price * amount;
+        const fee = total * 0.001;
+
+        totalValue.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        feeValue.textContent = '$' + fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      priceInput.addEventListener('input', updateSummary);
+      amountInput.addEventListener('input', updateSummary);
+
+      // Initialize summary
+      updateSummary();
+
+      // Simulate live price ticker (small random update) for realism
+      let currentPrice = 64382.50;
+      setInterval(() => {
+        // random walk small
+        const change = (Math.random() - 0.5) * 50;
+        currentPrice += change;
+        currentPrice = Math.max(63000, Math.min(66000, currentPrice));
+        const formatted = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        currentPriceEl.textContent = '$' + formatted;
+
+        // update price change percentage display
+        const changePercent = ((currentPrice - 62900) / 62900 * 100).toFixed(2);
+        const priceChangeEl = document.getElementById('priceChange');
+        if (changePercent >= 0) {
+          priceChangeEl.innerHTML = `<i class="fas fa-arrow-up"></i> +${changePercent}% (24h)`;
+          priceChangeEl.style.color = '#4ade80';
+        } else {
+          priceChangeEl.innerHTML = `<i class="fas fa-arrow-down"></i> ${changePercent}% (24h)`;
+          priceChangeEl.style.color = '#f87171';
+        }
+
+        // also update price input value if it matches old? (optional, we leave it)
+        // But we can update the price input if user hasn't focused? Not needed.
+      }, 2800);
+
+      // On window resize, redraw chart
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+      });
+
+      // Initial draw
+      resizeCanvas();
+
+      // Percentage buttons functionality
+      document.querySelectorAll('.percentage-buttons button').forEach((btn, idx) => {
+        btn.addEventListener('click', () => {
+          const percentages = [0.25, 0.5, 0.75, 1.0];
+          const percent = percentages[idx];
+          const price = parseFloat(priceInput.value.replace(/,/g, '')) || 0;
+          const available = 12480.50;
+          // Mock available balance in BTC: 12480.50 / price
+          const maxAmount = (available * percent) / price;
+          amountInput.value = maxAmount.toFixed(4);
+          updateSummary();
+        });
+      });
+
+      // Buy / Sell buttons (realistic feedback)
+      document.querySelector('.btn-buy').addEventListener('click', () => {
+        alert('✅ Buy order placed (simulated)');
+      });
+      document.querySelector('.btn-sell').addEventListener('click', () => {
+        alert('✅ Sell order placed (simulated)');
+      });
+
+      // Order type tabs switching
+      const tabs = document.querySelectorAll('.order-type-tabs button');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
+      });
+
+      // Timeframe switching (just visual)
+      document.querySelectorAll('.timeframes span').forEach(tf => {
+        tf.addEventListener('click', () => {
+          document.querySelectorAll('.timeframes span').forEach(t => t.classList.remove('active'));
+          tf.classList.add('active');
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>
